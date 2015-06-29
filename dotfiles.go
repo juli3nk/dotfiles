@@ -25,13 +25,20 @@ func New(homedir string, name string) (*Dotfiles, error) {
 	return dotfiles, nil
 }
 
-func GetFiles(dotfilesdir string) ([]string, error) {
+func GetFiles(dotfilesdir string, ignore []string) ([]string, error) {
 	var result []string
 
 	files, _ := ioutil.ReadDir(dotfilesdir)
 
+	// Remove the files to ignore from the list
 	for _, f := range files {
-		if f.Name() != ".dotfiles.yaml" {
+		if f.Name() == ".dotfiles.yaml" {
+			continue
+		} else if len(ignore) > 0 {
+			if ! StringInSlice(f.Name(), ignore) {
+				result = append(result, f.Name())
+			}
+		} else {
 			result = append(result, f.Name())
 		}
 	}
