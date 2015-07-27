@@ -50,9 +50,12 @@ func main() {
 	// Get config file full path
 	configfile := path.Join(dotfiles.Filepath, CONFIG_FILE)
 
-	// Parse config file
-	if err := config.Parse(configfile); err != nil {
-		fmt.Println(err)
+	// Parse config file if exists
+	_, err = os.Lstat(configfile)
+	if err == nil {
+		if err := config.Parse(configfile); err != nil {
+			fmt.Println(err)
+		}
 	}
 
 	// Get the list of files
@@ -70,46 +73,35 @@ func main() {
 
 	if flgSync {
 		for _, f := range files {
-			overwrite := false
+			file := &File{
+				Name: f,
+				Src: path.Join(dotfiles.Filepath, f),
+				Dst: path.Join(homedir, f),
+			}
 
-			src_f := path.Join(dotfiles.Filepath, f)
-			dst_f := path.Join(homedir, f)
-
-			fi, err := os.Lstat(dst_f)
-
-			if err != nil {
-				if flgDryRun {
-					fmt.Printf("Creating symlink: %s\n", f)
-				} else {
-					os.Symlink(src_f, dst_f)
-				}
+			if FileExist(file.Dst) == false {
+				file.Symlink(flgDryRun)
 
 				continue
 			}
 
-			if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
-				dst_l, err := os.Readlink(dst_f)
-				if err != nil {
-					fmt.Println(err)
-				}
-
-				if dst_l != src_f {
-					overwrite = true
-
-					fmt.Printf("Skipping \"%s\", use -force to override\n", f)
-				}
-			} else {
-				overwrite = true
+			sl, p, err := isSymlink(file.Dst)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
 			}
 
-			if flgForce && overwrite {
-				if flgDryRun {
-					fmt.Printf("Removing %s\n", f)
-					fmt.Printf("Creating symlink: %s\n", f)
-				} else {
-					os.Remove(dst_f)
-					os.Symlink(src_f, dst_f)
-				}
+			if sl == true && p == file.Src {
+				continue
+			}
+
+			if ( flgForce == false && sl == true && p != file.Src ) || ( flgForce == false && sl == false ) {
+				fmt.Printf("Skipping \"%s\", use -force to override\n", f)
+			}
+
+			if flgForce == true {
+				file.Remove(flgDryRun)
+				file.Symlink(flgDryRun)
 			}
 		}
 	}
