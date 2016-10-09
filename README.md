@@ -3,9 +3,10 @@
 ```console
 $ dotfiles -h
 Usage of dotfiles:
+  -dry-run=false: don't modify anything, just print commands
   -force=false: overwrite existing files
   -list=false: list currently managed dotfiles
-  -name="Dotfiles": name of your dotfiles repo
+  -name="Dotfiles": name of dotfiles repo
   -sync=false: update dotfile symlink
   -version=false: print version and exit
 ```
