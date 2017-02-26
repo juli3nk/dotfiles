@@ -5,23 +5,25 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+
+	"github.com/juliengk/go-utils"
 )
 
 type Dotfiles struct {
-	Name		string
-	Filepath	string
+	Name     string
+	Filepath string
 }
 
 type File struct {
-	Name		string
-	Src		string
-	Dst		string
+	Name string
+	Src  string
+	Dst  string
 }
 
 func New(homedir string, name string) (*Dotfiles, error) {
 	dotfiles := &Dotfiles{
-		Name:		name,
-		Filepath:	path.Join(homedir, name),
+		Name:     name,
+		Filepath: path.Join(homedir, name),
 	}
 
 	if _, err := os.Stat(dotfiles.Filepath); os.IsNotExist(err) {
@@ -41,7 +43,7 @@ func GetFiles(dotfilesdir string, ignore []string) ([]string, error) {
 		if f.Name() == ".dotfiles.yaml" {
 			continue
 		} else if len(ignore) > 0 {
-			if ! StringInSlice(f.Name(), ignore) {
+			if !utils.StringInSlice(f.Name(), ignore, false) {
 				result = append(result, f.Name())
 			}
 		} else {
@@ -50,45 +52,6 @@ func GetFiles(dotfilesdir string, ignore []string) ([]string, error) {
 	}
 
 	return result, nil
-}
-
-func StringInSlice(a string, list []string) bool {
-	for _, v := range list {
-		if a == v {
-			return true
-		}
-	}
-
-	return false
-}
-
-func FileExist(f string) bool {
-	_, err := os.Lstat(f)
-	if err != nil {
-		return false
-	}
-
-	return true
-}
-
-func isSymlink(f string) (bool, string, error) {
-	t := false
-	link := ""
-
-	fi, err := os.Lstat(f)
-	if err != nil {
-		return t, link, err
-	}
-
-	if fi.Mode()&os.ModeSymlink == os.ModeSymlink {
-		t = true
-		link, err = os.Readlink(f)
-		if err != nil {
-			return t, link, err
-		}
-	}
-
-	return t, link, nil
 }
 
 func (f *File) Symlink(dryrun bool) {

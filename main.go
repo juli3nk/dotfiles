@@ -5,18 +5,20 @@ import (
 	"fmt"
 	"os"
 	"path"
+
+	"github.com/juliengk/go-utils/filedir"
 )
 
 const VERSION = "v0.1.0"
 const CONFIG_FILE = ".dotfiles.yaml"
 
 var (
-	flgForce	bool
-	flgList		bool
-	flgName		string
-	flgSync		bool
-	flgDryRun	bool
-	flgVersion	bool
+	flgForce   bool
+	flgList    bool
+	flgName    string
+	flgSync    bool
+	flgDryRun  bool
+	flgVersion bool
 )
 
 func init() {
@@ -75,17 +77,17 @@ func main() {
 		for _, f := range files {
 			file := &File{
 				Name: f,
-				Src: path.Join(dotfiles.Filepath, f),
-				Dst: path.Join(homedir, f),
+				Src:  path.Join(dotfiles.Filepath, f),
+				Dst:  path.Join(homedir, f),
 			}
 
-			if FileExist(file.Dst) == false {
+			if filedir.FileExists(file.Dst) == false {
 				file.Symlink(flgDryRun)
 
 				continue
 			}
 
-			sl, p, err := isSymlink(file.Dst)
+			sl, p, err := filedir.IsSymlink(file.Dst)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -95,7 +97,7 @@ func main() {
 				continue
 			}
 
-			if ( flgForce == false && sl == true && p != file.Src ) || ( flgForce == false && sl == false ) {
+			if (flgForce == false && sl == true && p != file.Src) || (flgForce == false && sl == false) {
 				fmt.Printf("Skipping \"%s\", use -force to override\n", f)
 			}
 
