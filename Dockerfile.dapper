@@ -1,0 +1,42 @@
+FROM debian:jessie-slim
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		build-essential \
+		ca-certificates \
+		curl \
+		gccgo \
+		git \
+		vim
+
+########## Dapper Configuration #####################
+
+ENV DAPPER_SOURCE /go/src/github.com/juliengk/dotfiles
+ENV DAPPER_OUTPUT ./bin
+ENV SHELL /bin/bash
+
+WORKDIR ${DAPPER_SOURCE}
+
+########## General Configuration #####################
+ARG DAPPER_HOST_ARCH=amd64
+ARG HOST_ARCH=${DAPPER_HOST_ARCH}
+ARG ARCH=${HOST_ARCH}
+
+ARG APP_REPO=juliengk
+
+# Set up environment and export all ARGS as ENV
+ENV ARCH=${ARCH} \
+	HOST_ARCH=${HOST_ARCH} \
+	DAPPER_HOST_ARCH=${DAPPER_HOST_ARCH}
+
+ENV GO_VERSION=1.8 \
+	GOPATH=/go \
+	GOARCH=$ARCH
+
+ENV PATH=/go/bin:/usr/local/go/bin:$PATH
+
+# Install Go
+RUN curl -sfL https://storage.googleapis.com/golang/go${GO_VERSION}.linux-amd64.tar.gz | tar -xzC /usr/local
+
+ENTRYPOINT ["./scripts/entry"]
+CMD ["ci"]
