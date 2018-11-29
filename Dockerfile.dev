@@ -1,0 +1,49 @@
+FROM debian:stable-slim
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		build-essential \
+		ca-certificates \
+		curl \
+		gccgo \
+		git \
+		iproute2 \
+		iputils-ping \
+		less \
+		procps \
+		vim \
+		wget
+
+########## Dapper Configuration #####################
+ENV DAPPER_RUN_ARGS --privileged --name dotfiles_dev
+ENV DAPPER_SOURCE /go/src/github.com/juliengk/dotfiles
+
+WORKDIR ${DAPPER_SOURCE}
+
+########## General Configuration #####################
+ARG DAPPER_HOST_ARCH=amd64
+ARG HOST_ARCH=${DAPPER_HOST_ARCH}
+ARG ARCH=${HOST_ARCH}
+
+# Set up environment and export all ARGS as ENV
+ENV ARCH=${ARCH} \
+	HOST_ARCH=${HOST_ARCH}
+
+ENV DAPPER_HOST_ARCH=${DAPPER_HOST_ARCH} \
+	GOPATH=/go \
+	GOARCH=$ARCH \
+	GO_VERSION=1.11.2
+
+ENV PATH=$PATH:/go/bin:/usr/local/go/bin
+
+# Install Go
+RUN curl -sfL https://storage.googleapis.com/golang/go${GO_VERSION}.linux-amd64.tar.gz | tar -xzC /usr/local
+
+# Install govendor
+RUN go get -u github.com/kardianos/govendor
+
+# Install Golint
+RUN go get -u github.com/golang/lint/golint
+
+# Clone dot-files
+RUN git clone https://github.com/juliengk/dot-files /root/Dotfiles

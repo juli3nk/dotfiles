@@ -5,45 +5,44 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/juliengk/go-utils/filedir"
 )
 
-const VERSION = "v0.1.0"
-const CONFIG_FILE = ".dotfiles.yaml"
+const VERSION = "v0.2.0"
+const CONFIG_FILE = ".dotfiles.yml"
 
 var (
+	flgDryRun  bool
 	flgForce   bool
 	flgList    bool
 	flgName    string
+	flgProfile string
 	flgSync    bool
-	flgDryRun  bool
 	flgVersion bool
 )
 
 func init() {
+	flag.BoolVar(&flgDryRun, "dry-run", false, "don't modify anything, just print commands")
 	flag.BoolVar(&flgForce, "force", false, "overwrite existing files")
 	flag.BoolVar(&flgList, "list", false, "list currently managed dotfiles")
 	flag.StringVar(&flgName, "name", "Dotfiles", "name of dotfiles repo")
+	flag.StringVar(&flgProfile, "profile", "", "name of the profile to use")
 	flag.BoolVar(&flgSync, "sync", false, "update dotfile symlink")
-	flag.BoolVar(&flgDryRun, "dry-run", false, "don't modify anything, just print commands")
 	flag.BoolVar(&flgVersion, "version", false, "print version and exit")
 	flag.Parse()
 }
 
 func main() {
-	var config Config
-
 	if flgVersion {
 		fmt.Println(VERSION)
 		return
 	}
 
-	name := flgName
-
 	homedir := os.Getenv("HOME")
 
-	dotfiles, err := New(homedir, name)
+	dotfiles, err := New(homedir, flgName)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -52,35 +51,76 @@ func main() {
 	// Get config file full path
 	configfile := path.Join(dotfiles.Filepath, CONFIG_FILE)
 
-	// Parse config file if exists
-	_, err = os.Lstat(configfile)
-	if err == nil {
-		if err := config.Parse(configfile); err != nil {
-			fmt.Println(err)
-		}
-	}
-
-	// Get the list of files
-	files, err := GetFiles(dotfiles.Filepath, config.Ignore)
+	config, err := NewConfig(configfile)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	if flgList {
-		for _, f := range files {
-			fmt.Println(f)
+	if len(flgProfile) > 0 {
+		if err := config.existsProfile(flgProfile); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
 	}
 
-	if flgSync {
-		for _, f := range files {
-			file := &File{
-				Name: f,
-				Src:  path.Join(dotfiles.Filepath, f),
-				Dst:  path.Join(homedir, f),
-			}
+	// Create directories
+	directories := config.getDirectories(flgProfile)
 
+	for _, dir := range directories {
+		MakeDirectory(homedir, dir, flgDryRun)
+	}
+
+	// Get the list of files
+	var files2 []*File
+	var links2 []string
+
+	ignore := config.getIgnore(flgProfile)
+	links := config.getLinks(flgProfile)
+
+	for _, l := range links {
+		s := strings.Split(l, ":")
+
+		links2 = append(links2, s[0])
+
+		f := File{
+			Name: s[0],
+			Src:  path.Join(dotfiles.Filepath, s[0]),
+		}
+		if len(s) == 2 {
+			f.Dst = path.Join(homedir, s[1])
+		} else {
+			f.Dst = path.Join(homedir, s[0])
+		}
+		files2 = append(files2, &f)
+	}
+
+	files, err := GetFiles(dotfiles.Filepath, ignore, links2)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	for _, file := range files {
+		f := File{
+			Name: file,
+			Src:  path.Join(dotfiles.Filepath, file),
+			Dst:  path.Join(homedir, file),
+		}
+		files2 = append(files2, &f)
+	}
+
+	// Execute
+	if flgList {
+		for _, file := range files2 {
+			fmt.Println(file.Name)
+		}
+
+		os.Exit(0)
+	}
+
+	if flgSync {
+		for _, file := range files2 {
 			if filedir.FileExists(file.Dst) == false {
 				file.Symlink(flgDryRun)
 
@@ -98,7 +138,7 @@ func main() {
 			}
 
 			if (flgForce == false && sl == true && p != file.Src) || (flgForce == false && sl == false) {
-				fmt.Printf("Skipping \"%s\", use -force to override\n", f)
+				fmt.Printf("Skipping, use -force to override: %s\n", file.Name)
 			}
 
 			if flgForce == true {

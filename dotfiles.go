@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/juliengk/go-utils"
+	"github.com/juliengk/go-utils/filedir"
 )
 
 type Dotfiles struct {
@@ -33,25 +34,54 @@ func New(homedir string, name string) (*Dotfiles, error) {
 	return dotfiles, nil
 }
 
-func GetFiles(dotfilesdir string, ignore []string) ([]string, error) {
+func GetFiles(dotfilesdir string, ignore, links []string) ([]string, error) {
 	var result []string
 
 	files, _ := ioutil.ReadDir(dotfilesdir)
 
-	// Remove the files to ignore from the list
 	for _, f := range files {
-		if f.Name() == ".dotfiles.yaml" {
+		if f.Name() == CONFIG_FILE {
 			continue
-		} else if len(ignore) > 0 {
-			if !utils.StringInSlice(f.Name(), ignore, false) {
-				result = append(result, f.Name())
-			}
-		} else {
-			result = append(result, f.Name())
 		}
+
+		if len(ignore) > 0 {
+			if utils.StringInSlice(f.Name(), ignore, false) {
+				continue
+			}
+		}
+
+		if len(links) > 0 {
+			if utils.StringInSlice(f.Name(), links, false) {
+				continue
+			}
+		}
+
+		result = append(result, f.Name())
 	}
 
 	return result, nil
+}
+
+func MakeDirectory(homedir string, dir Dir, dryrun bool) {
+	folder := path.Join(homedir, dir.Name)
+
+	if dryrun {
+		if !filedir.DirExists(folder) {
+			fmt.Printf("Creating directory: %s\n", dir.Name)
+		}
+	} else {
+		if err := filedir.CreateDirIfNotExist(folder, true, dir.Chmod); err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
+func (f *File) Remove(dryrun bool) {
+	if dryrun {
+		fmt.Printf("Removing file: %s\n", f.Name)
+	} else {
+		os.Remove(f.Dst)
+	}
 }
 
 func (f *File) Symlink(dryrun bool) {
@@ -59,13 +89,5 @@ func (f *File) Symlink(dryrun bool) {
 		fmt.Printf("Creating symlink: %s\n", f.Name)
 	} else {
 		os.Symlink(f.Src, f.Dst)
-	}
-}
-
-func (f *File) Remove(dryrun bool) {
-	if dryrun {
-		fmt.Printf("Removing %s\n", f.Name)
-	} else {
-		os.Remove(f.Dst)
 	}
 }

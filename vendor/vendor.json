@@ -3,22 +3,22 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "iKxXqCmEK8bzdsb6+HcbbHTK+sY=",
+			"checksumSHA1": "A8BsAO7UTh29anYIVPv0DobRcbg=",
 			"path": "github.com/juliengk/go-utils",
-			"revision": "ea868d6f9306e100d6c43749f3a7dfd2cf823ea0",
-			"revisionTime": "2017-02-03T15:06:23Z"
+			"revision": "20776979abdb7b88224d22b021041eaceb833659",
+			"revisionTime": "2018-03-21T16:21:44Z"
 		},
 		{
-			"checksumSHA1": "FqZ6T6IFd7rcH1fDsFnBE1GvUx8=",
+			"checksumSHA1": "blC8BiiPdg4xYMXS6iOE7G7ueqI=",
 			"path": "github.com/juliengk/go-utils/filedir",
-			"revision": "ea868d6f9306e100d6c43749f3a7dfd2cf823ea0",
-			"revisionTime": "2017-02-03T15:06:23Z"
+			"revision": "20776979abdb7b88224d22b021041eaceb833659",
+			"revisionTime": "2018-03-21T16:21:44Z"
 		},
 		{
-			"checksumSHA1": "0KwOlQV1dNUh9X8t+5s7nX5bqfk=",
+			"checksumSHA1": "QqDq2x8XOU7IoOR98Cx1eiV5QY8=",
 			"path": "gopkg.in/yaml.v2",
-			"revision": "a3f3340b5840cee44f372bddb5880fcbc419b46a",
-			"revisionTime": "2017-02-08T14:18:51Z"
+			"revision": "51d6538a90f86fe93ac480b35f37b2be17fef232",
+			"revisionTime": "2018-11-15T11:05:04Z"
 		}
 	],
 	"rootPath": "github.com/juliengk/dotfiles"
