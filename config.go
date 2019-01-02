@@ -66,7 +66,7 @@ func (c *Config) getDirectories(profileName string) []Dir {
 		result = append(result, dir)
 	}
 
-	if profileName == "" {
+	if len(profileName) == 0 {
 		return result
 	}
 
