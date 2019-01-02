@@ -59,6 +59,10 @@ func (c *Config) getDirectories(profileName string) []Dir {
 	var result []Dir
 
 	for _, dir := range c.Common.Dirs {
+		if dir.Chmod == 0000 {
+			dir.Chmod = 0775
+		}
+
 		result = append(result, dir)
 	}
 
@@ -69,7 +73,7 @@ func (c *Config) getDirectories(profileName string) []Dir {
 	if len(c.Profiles[profileName].Include) > 0 {
 		for _, tpl := range c.Profiles[profileName].Include {
 			for _, dir := range c.Templates[tpl].Dirs {
-				if dir.Chmod == 0 {
+				if dir.Chmod == 0000 {
 					dir.Chmod = 0775
 				}
 
@@ -82,6 +86,10 @@ func (c *Config) getDirectories(profileName string) []Dir {
 		return result
 	}
 	for _, dir := range c.Profiles[profileName].Dirs {
+		if dir.Chmod == 0000 {
+			dir.Chmod = 0775
+		}
+
 		result = append(result, dir)
 	}
 
