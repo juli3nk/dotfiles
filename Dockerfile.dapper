@@ -1,4 +1,4 @@
-FROM debian:jessie-slim
+FROM debian:stable-slim
 
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
@@ -6,8 +6,7 @@ RUN apt-get update \
 		ca-certificates \
 		curl \
 		gccgo \
-		git \
-		vim
+		git
 
 ########## Dapper Configuration #####################
 
@@ -29,7 +28,7 @@ ENV ARCH=${ARCH} \
 	HOST_ARCH=${HOST_ARCH} \
 	DAPPER_HOST_ARCH=${DAPPER_HOST_ARCH}
 
-ENV GO_VERSION=1.8 \
+ENV GO_VERSION=1.10.3 \
 	GOPATH=/go \
 	GOARCH=$ARCH
 
