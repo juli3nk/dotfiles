@@ -7,10 +7,10 @@ import (
 	"path"
 	"strings"
 
+	"github.com/juliengk/dotfiles/version"
 	"github.com/juliengk/go-utils/filedir"
 )
 
-const VERSION = "v0.2.0"
 const CONFIG_FILE = ".dotfiles.yml"
 
 var (
@@ -36,7 +36,8 @@ func init() {
 
 func main() {
 	if flgVersion {
-		fmt.Println(VERSION)
+		ver := version.New()
+		ver.Show()
 		return
 	}
 
