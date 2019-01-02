@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-CGO_ENABLED=0
-
 OUTPUT=${OUTPUT:-bin/dotfiles}
 
 source $(dirname $0)/version

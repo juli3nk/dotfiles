@@ -54,7 +54,7 @@ shellcheck:
 dockerlint:
 	@for file in $(shell find . -name 'Dockerfile*'); do \
 		echo "Validating : $$file"; \
-		docker container run -i --rm hadolint/hadolint hadolint --ignore DL3018 --ignore DL3013 - < $$file; \
+		docker container run -i --rm hadolint/hadolint hadolint --ignore DL3008 --ignore DL3009 --ignore DL3018 --ignore DL3013 --ignore DL4006 - < $$file; \
 	done;
 
 .DEFAULT_GOAL := ci
