@@ -77,11 +77,23 @@ func MakeDirectory(homedir string, dir Dir, dryrun bool) {
 }
 
 func (f *File) Remove(dryrun bool) {
-	if dryrun {
-		fmt.Printf("Removing file: %s\n", f.Name)
-	} else {
-		os.Remove(f.Dst)
+	mode := "file"
+
+	fi, err := os.Lstat(f.Dst)
+	if err != nil {
+		fmt.Println(err)
 	}
+
+	if fi.IsDir() {
+		mode = "directory"
+	}
+
+	if dryrun {
+		fmt.Printf("Removing %s: %s\n", mode, f.Name)
+		return
+	}
+
+	os.RemoveAll(f.Dst)
 }
 
 func (f *File) Symlink(dryrun bool) {
