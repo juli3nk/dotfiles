@@ -14,12 +14,17 @@ require (
 	github.com/99designs/gqlgen v0.17.31 // indirect
 	github.com/Khan/genqlient v0.6.0 // indirect
 	github.com/adrg/xdg v0.4.0 // indirect
+	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/github-release/github-release v0.10.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
+	github.com/kevinburke/rest v0.0.0-20230306061549-8f487d822ad0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0-rc2.0.20221005185240-3a7f492d3f1b // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.6 // indirect
+	github.com/voxelbrain/goptions v0.0.0-20180630082107-58cddc247ea2 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect
