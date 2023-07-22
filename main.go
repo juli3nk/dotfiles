@@ -7,8 +7,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/juliengk/dotfiles/version"
-	"github.com/juliengk/go-utils/filedir"
+	"github.com/juli3nk/dotfiles/version"
+	"github.com/juli3nk/go-utils/filedir"
 )
 
 const CONFIG_FILE = ".dotfiles.yml"

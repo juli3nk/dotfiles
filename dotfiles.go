@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/juliengk/go-utils"
-	"github.com/juliengk/go-utils/filedir"
+	"github.com/juli3nk/go-utils/filedir"
+	"github.com/thoas/go-funk"
 )
 
 type Dotfiles struct {
@@ -45,13 +45,13 @@ func GetFiles(dotfilesdir string, ignore, links []string) ([]string, error) {
 		}
 
 		if len(ignore) > 0 {
-			if utils.StringInSlice(f.Name(), ignore, false) {
+			if funk.Contains(ignore, f.Name()) {
 				continue
 			}
 		}
 
 		if len(links) > 0 {
-			if utils.StringInSlice(f.Name(), links, false) {
+			if funk.Contains(links, f.Name()) {
 				continue
 			}
 		}

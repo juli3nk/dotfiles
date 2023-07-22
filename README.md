@@ -24,7 +24,7 @@ For installation instructions from binaries please visit the [Releases Page](htt
 ### Via Go
 
 ```console
-$ go get github.com/juliengk/dotfiles
+$ go get github.com/juli3nk/dotfiles
 ```
 
 ## Usage
