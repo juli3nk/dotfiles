@@ -1,0 +1,37 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-go@v4
+        with:
+          go-version: '>=1.20'
+      - name: Install Dagger Dagger
+        run: go get dagger.io/dagger@latest cloud.google.com/go/run/apiv2
+      - name: Release and deploy with Dagger
+        run: go run ci/main.go
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+      - name: Install Github Release
+        run: GO111MODULE=off go get github.com/github-release/github-release
+      - name: Run Github Release
+        run: github-release release --user juli3nk --repo dotfiles --tag ${{ steps.tag.outputs.tag }} --name "${{ steps.tag.outputs.tag }}" --description "Release dotfiles version ${{ steps.tag.outputs.tag }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sleep for 10 seconds
+        run: sleep 10s
+        shell: bash
+      - name: Run Github Release upload file
+        run: github-release upload --user juli3nk --repo dotfiles --tag ${{ steps.tag.outputs.tag }} --name "dotfiles-linux-amd64" --file dist/dotfiles-amd64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
