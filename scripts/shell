@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# help: Launch shell in build environment
-
-exec bash
