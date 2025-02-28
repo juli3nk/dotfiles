@@ -4,15 +4,15 @@ import (
 	"os"
 	"runtime"
 	"strconv"
+	"strings"
 	"text/template"
 	"time"
 )
 
 var (
-	Version   string
-	GitCommit string = "HEAD"
-	GitState  string = "dirty"
-	BuildDate string = "0"
+	Version   = "unknown-version"
+	GitCommit = "unknown-commit"
+	BuildDate = "unknown-builddate"
 )
 
 var versionTemplate = `Version:     {{.Version}}
@@ -20,7 +20,7 @@ Git commit:  {{.GitCommit}}{{if eq .GitState "dirty"}}
 Git State:   {{.GitState}}{{end}}
 Built:       {{.BuildDate}}
 Go version:  {{.GoVersion}}
-OS/Arch:     {{.Os}}/{{.Arch}}
+OS/Arch:     {{.OS}}/{{.Arch}}
 `
 
 type VersionInfo struct {
@@ -29,7 +29,7 @@ type VersionInfo struct {
 	GitCommit string
 	GitState  string
 	BuildDate string
-	Os        string
+	OS        string
 	Arch      string
 }
 
@@ -41,15 +41,20 @@ func New() *VersionInfo {
 
 	tu := time.Unix(i, 0)
 
-	return &VersionInfo{
+	vi := VersionInfo{
 		Version:   Version,
 		GoVersion: runtime.Version(),
 		GitCommit: GitCommit,
-		GitState:  GitState,
 		BuildDate: tu.String(),
-		Os:        runtime.GOOS,
+		OS:        runtime.GOOS,
 		Arch:      runtime.GOARCH,
 	}
+
+	if strings.HasSuffix(Version, "-dirty") {
+		vi.GitState = "dirty"
+	}
+
+	return &vi
 }
 
 func (i *VersionInfo) Show() {
