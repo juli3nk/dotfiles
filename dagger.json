@@ -1,0 +1,40 @@
+{
+  "name": "dotfiles",
+  "engineVersion": "v0.18.16",
+  "sdk": {
+    "source": "go"
+  },
+  "dependencies": [
+    {
+      "name": "commitlint",
+      "source": "github.com/cloudnative-pg/daggerverse/commitlint",
+      "pin": "6b024d94e8661e87ede84039fd2e3e256dc08fb6"
+    },
+    {
+      "name": "gh",
+      "source": "github.com/sagikazarmark/daggerverse/gh",
+      "pin": "ceffda4aebd349a24fc00e591b4ed9b801535b65"
+    },
+    {
+      "name": "gitlocal",
+      "source": "github.com/juli3nk/daggerverse/gitlocal",
+      "pin": "13251b94e0cc875b6ea663dcf5e7375f206a0296"
+    },
+    {
+      "name": "go",
+      "source": "github.com/juli3nk/daggerverse/go",
+      "pin": "13251b94e0cc875b6ea663dcf5e7375f206a0296"
+    },
+    {
+      "name": "jsonfile",
+      "source": "github.com/juli3nk/daggerverse/jsonfile",
+      "pin": "13251b94e0cc875b6ea663dcf5e7375f206a0296"
+    },
+    {
+      "name": "semantic-release",
+      "source": "github.com/juli3nk/daggerverse/semantic-release",
+      "pin": "13251b94e0cc875b6ea663dcf5e7375f206a0296"
+    }
+  ],
+  "source": ".dagger"
+}
