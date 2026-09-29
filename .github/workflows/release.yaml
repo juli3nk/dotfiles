@@ -4,49 +4,38 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
+  lint-go:
+    uses: juli3nk/ci-shared/.github/workflows/go-lint.yaml@main
+    with:
+      go_version: ${{ vars.GO_VERSION }}
+      check_all: true
+
+  deps:
+    uses: juli3nk/ci-shared/.github/workflows/go-deps.yaml@main
+    with:
+      go_version: ${{ vars.GO_VERSION }}
+      check_licenses: false
+
+  build:
+    needs: [lint-go, deps]
+    uses: juli3nk/ci-shared/.github/workflows/go-build.yaml@main
+
   release:
-    runs-on: ubuntu-latest
+    needs: build
     permissions:
       contents: write
-    env:
-      DAGGER_NO_NAG: "1"
-    outputs:
-      tag: ${{ steps.get_tag.outputs.tag }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Call Dagger Function to release
-        uses: dagger/dagger-for-github@8.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          call: --source . release --github-token env:GITHUB_TOKEN --ci=true --dry-run=false
-
-      - name: Set Output Tag
-        id: get_tag
-        run: |
-          git fetch --tags --force
-          echo "tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+    uses: juli3nk/ci-shared/.github/workflows/release.yaml@main
 
   publish:
-    runs-on: ubuntu-latest
-    needs: [release]
+    needs: release
+    if: needs.release.outputs.released == 'true'
     permissions:
       contents: write
-    env:
-      DAGGER_NO_NAG: "1"
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.release.outputs.tag }}
-          fetch-depth: 0
-
-      - name: Call Dagger Function to build and push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: dagger/dagger-for-github@8.0.0
-        with:
-          call: --source . build publish --token env:GITHUB_TOKEN
+      packages: write
+    uses: juli3nk/ci-shared/.github/workflows/go-publish.yaml@main
+    with:
+      released: ${{ needs.release.outputs.released }}
+      tag: ${{ needs.release.outputs.tag }}
