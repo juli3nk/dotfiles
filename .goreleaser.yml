@@ -1,0 +1,21 @@
+version: 2
+
+project_name: dotfiles
+
+changelog:
+  disable: true
+
+builds:
+  - main: ./cmd/dotfiles
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s
+      - -w
+      - -X github.com/juli3nk/dotfiles/internal/cli.appVersion={{.Version}}
+      - -X github.com/juli3nk/dotfiles/internal/cli.appCommit={{.Commit}}
+      - -X github.com/juli3nk/dotfiles/internal/cli.appBuildDate={{.Date}}
+    goos:
+      - linux
+    goarch:
+      - amd64
